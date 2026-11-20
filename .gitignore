@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.DS_Store
+data/raw/*.xlsx
+data/processed/
+output/
+*.log
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage.json
+htmlcov/
+review_code_only.zip
+
+data/raw/*.zip

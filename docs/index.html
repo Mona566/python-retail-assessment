@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Python Retail Assessment — Pipeline Showcase</title>
+  <meta name="description" content="Online Retail II take-home: measured prep optimisations, 98% test coverage, fail-loud Excel/Outlook automation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f1c24;
+      --ink-soft: #243642;
+      --fog: #e8eef2;
+      --paper: #f6f8f7;
+      --line: rgba(15, 28, 36, 0.12);
+      --teal: #0f766e;
+      --teal-deep: #115e59;
+      --amber: #c27803;
+      --good: #047857;
+      --muted: #5b6b75;
+      --max: 1080px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, rgba(15, 118, 110, 0.16), transparent 55%),
+        radial-gradient(900px 420px at 100% 0%, rgba(194, 120, 3, 0.12), transparent 50%),
+        linear-gradient(180deg, #eef4f2 0%, var(--paper) 28%, #fbfcfb 100%);
+      font-family: "Instrument Sans", system-ui, sans-serif;
+      line-height: 1.55;
+    }
+    a { color: var(--teal-deep); }
+    .wrap { width: min(100% - 2.5rem, var(--max)); margin-inline: auto; }
+    header.hero {
+      padding: 4.5rem 0 3.25rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      margin: 0 0 0.85rem;
+      max-width: 16ch;
+    }
+    .lede {
+      font-size: 1.125rem;
+      color: var(--ink-soft);
+      max-width: 52ch;
+      margin: 0 0 1.75rem;
+    }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; align-items: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1.15rem;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+      transition: transform 160ms ease, background 160ms ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--ink); color: #f4faf8; }
+    .btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }
+    .meta {
+      margin-top: 1.5rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    section {
+      padding: 3.25rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    section h2 {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.01em;
+    }
+    section .sub {
+      color: var(--muted);
+      margin: 0 0 1.75rem;
+      max-width: 60ch;
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    .metric {
+      padding: 1.15rem 1.2rem 1.25rem;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      backdrop-filter: blur(6px);
+    }
+    .metric .label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .metric .value {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: var(--teal-deep);
+      line-height: 1.15;
+    }
+    .metric .hint { font-size: 0.82rem; color: var(--muted); margin-top: 0.35rem; }
+    .flow {
+      display: grid;
+      gap: 0.65rem;
+      counter-reset: step;
+    }
+    .flow-step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      align-items: start;
+      padding: 1rem 1.1rem;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .flow-step::before {
+      counter-increment: step;
+      content: counter(step);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .flow-step h3 { margin: 0.1rem 0 0.25rem; font-size: 1.02rem; }
+    .flow-step p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+    .arrow {
+      text-align: center;
+      color: var(--teal);
+      font-size: 1.1rem;
+      line-height: 1;
+      opacity: 0.7;
+    }
+    table.perf {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .perf th, .perf td {
+      text-align: left;
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .perf th { background: rgba(15, 28, 36, 0.04); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    .perf tr:last-child td { border-bottom: 0; }
+    .delta { color: var(--good); font-weight: 700; white-space: nowrap; }
+    .arch {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+    }
+    .arch article {
+      padding: 1rem 1.05rem;
+      border-left: 3px solid var(--teal);
+      background: rgba(255, 255, 255, 0.55);
+    }
+    .arch h3 { margin: 0 0 0.3rem; font-size: 0.98rem; }
+    .arch p { margin: 0; font-size: 0.88rem; color: var(--muted); }
+    .decisions { display: grid; gap: 1rem; }
+    .decision {
+      padding: 1.1rem 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+    .decision strong { display: block; margin-bottom: 0.3rem; }
+    .decision span { color: var(--muted); font-size: 0.92rem; }
+    ul.limits { margin: 0; padding-left: 1.15rem; color: var(--ink-soft); }
+    ul.limits li { margin: 0.4rem 0; }
+    footer {
+      padding: 2.5rem 0 3.5rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .note {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      background: rgba(15, 118, 110, 0.08);
+      border: 1px solid rgba(15, 118, 110, 0.18);
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .btn:hover { transform: none; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="brand">Python Retail Assessment</p>
+      <p class="lede">
+        Online Retail II end-to-end pipeline: clean ledger → contract metrics →
+        native Excel PivotTables / PNGs → ZIP → Outlook dry-run.
+        Built to be reviewable — timed phases, fail-loud validation, and measured hotspots.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="../README.md">Read README</a>
+        <a class="btn btn-ghost" href="PIPELINE_FLOW.md">Pipeline detail</a>
+        <a class="btn btn-ghost" href="../scripts/bench_hotspots.py">Bench script</a>
+      </div>
+      <p class="meta">
+        Metrics below are from this machine’s pytest + <code>scripts/bench_hotspots.py --rows 100000</code>
+        (2026-11-20 · Python 3.12 · macOS arm64). Re-run to refresh.
+      </p>
+    </div>
+  </header>
+
+  <section id="results">
+    <div class="wrap">
+      <h2>Quantified results</h2>
+      <p class="sub">Only numbers we actually measured — not aspirational targets.</p>
+      <div class="metrics">
+        <div class="metric">
+          <div class="label">Line coverage</div>
+          <div class="value">98%</div>
+          <div class="hint">src/ + main.py · 119 tests passed</div>
+        </div>
+        <div class="metric">
+          <div class="label">Business-key join</div>
+          <div class="value">−94.9%</div>
+          <div class="hint">3.156s → 0.162s on 100k rows</div>
+        </div>
+        <div class="metric">
+          <div class="label">Description mode</div>
+          <div class="value">−83.2%</div>
+          <div class="hint">0.046s → 0.008s vectorized</div>
+        </div>
+        <div class="metric">
+          <div class="label">Parallel audit I/O</div>
+          <div class="value">−36.3%</div>
+          <div class="hint">8×2MB writes · ThreadPool vs serial</div>
+        </div>
+        <div class="metric">
+          <div class="label">Bench peak RSS</div>
+          <div class="value">389 MB</div>
+          <div class="hint">During hotspot micro-bench</div>
+        </div>
+        <div class="metric">
+          <div class="label">Metrics contract</div>
+          <div class="value">v1.6.2</div>
+          <div class="hint">Single source for Gross / Net / returns</div>
+        </div>
+      </div>
+      <p class="note">
+        Full Online Retail II (~1M rows) wall-clock is still dominated by Excel openpyxl load
+        and xlwings Pivot/PNG. The reductions above prove the prep CPU/I/O fixes that shipped in code.
+      </p>
+    </div>
+  </section>
+
+  <section id="pipeline">
+    <div class="wrap">
+      <h2>Data path</h2>
+      <p class="sub">Read → prepare → analyse → store/export → package/email. Excel COM and Outlook stay single-threaded.</p>
+      <div class="flow">
+        <div class="flow-step">
+          <div>
+            <h3>Read</h3>
+            <p>Locate workbook · SHA-256 · single <code>ExcelFile</code> + per-sheet <code>read_excel</code> (no re-open). Required UCI columns validated per sheet.</p>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="flow-step">
+          <div>
+            <h3>Prepare</h3>
+            <p>Cross-sheet dedupe · enrich taxonomy (return line / confirmed / adjustment) · vectorized business keys &amp; helpers · schema gate.</p>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="flow-step">
+          <div>
+            <h3>Analyse</h3>
+            <p>Shared non-cancellation sales view · product/country/month/returns/customer/timing · IQR anomaly quotas · Summary narrative.</p>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="flow-step">
+          <div>
+            <h3>Store</h3>
+            <p>Parquet clean ledger · ThreadPool for independent audit JSON/CSV writes · xlsxwriter base book · native PivotTables + PNG.</p>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="flow-step">
+          <div>
+            <h3>Output</h3>
+            <p>Validation (prep / analyses / workbook / PNGs) · full ZIP + email-safe ZIP · Outlook dry-run HTML; send only with explicit flags.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="perf">
+    <div class="wrap">
+      <h2>Hotspot benchmark (measured)</h2>
+      <p class="sub"><code>python scripts/bench_hotspots.py --rows 100000</code> → <code>output/audit/perf_bench_latest.json</code></p>
+      <table class="perf">
+        <thead>
+          <tr>
+            <th>Hotspot</th>
+            <th>Before</th>
+            <th>After</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Business key (<code>agg("||".join)</code> vs <code>str.cat</code>)</td>
+            <td>3.156s</td>
+            <td>0.162s</td>
+            <td class="delta">94.9% ↓</td>
+          </tr>
+          <tr>
+            <td>Description mode (Python agg vs vectorized)</td>
+            <td>0.046s</td>
+            <td>0.008s</td>
+            <td class="delta">83.2% ↓</td>
+          </tr>
+          <tr>
+            <td>Independent file writes (serial vs ThreadPool)</td>
+            <td>0.0024s</td>
+            <td>0.0015s</td>
+            <td class="delta">36.3% ↓</td>
+          </tr>
+          <tr>
+            <td>Active sales materialize (<code>.copy()</code> vs view)</td>
+            <td>0.0002s</td>
+            <td>0.0001s</td>
+            <td class="delta">58.3% ↓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="architecture">
+    <div class="wrap">
+      <h2>Architecture</h2>
+      <p class="sub"><code>main.py</code> only orchestrates. Business logic lives in focused <code>src/</code> modules with a single metrics contract.</p>
+      <div class="arch">
+        <article>
+          <h3>main.py</h3>
+          <p>CLI · PipelineRun state machine · stage exits · send policy</p>
+        </article>
+        <article>
+          <h3>data_processing</h3>
+          <p>Load · dedupe · enrich · parquet · parallel audit I/O</p>
+        </article>
+        <article>
+          <h3>analysis_*</h3>
+          <p>Rankings · anomalies · summary narrative</p>
+        </article>
+        <article>
+          <h3>excel_*</h3>
+          <p>xlsxwriter · pivots · PNG · specs as SSOT</p>
+        </article>
+        <article>
+          <h3>validation</h3>
+          <p>Prep / analyses / workbook / PNG contracts</p>
+        </article>
+        <article>
+          <h3>packaging + email</h3>
+          <p>Full vs email-safe ZIP · Outlook dry-run / one send</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="decisions">
+    <div class="wrap">
+      <h2>Design decisions</h2>
+      <p class="sub">Why these shapes — not just what files exist.</p>
+      <div class="decisions">
+        <div class="decision">
+          <strong>Metrics contract (<code>METRICS_VERSION</code>)</strong>
+          <span>Gross / Net / return-line taxonomy / Top-N live in one module so Summary, Pivot, and email cannot drift. Meaning changes require a version bump.</span>
+        </div>
+        <div class="decision">
+          <strong>Fail loud, don’t “almost ship”</strong>
+          <span>Blank PNGs, visible Grand Totals on rate pivots, stale <code>--reuse-clean</code> schema, invalid recipients → non-zero exit. No silent subset when Clean_Data exceeds Excel’s row limit.</span>
+        </div>
+        <div class="decision">
+          <strong>Threads only for independent I/O</strong>
+          <span>Excel sheet parse and COM stay sequential. <code>ThreadPoolExecutor</code> overlaps parquet/CSV/JSON audit writes where sinks do not share mutable state.</span>
+        </div>
+        <div class="decision">
+          <strong>Observability by default</strong>
+          <span><code>time.perf_counter()</code> via <code>PipelineRun.step</code> / <code>timed_phase</code>; logs include duration and <code>rows_per_sec</code>; run JSON stores <code>timing_summary</code> + <code>peak_rss_mb</code>.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="limits">
+    <div class="wrap">
+      <h2>Known limits &amp; next steps</h2>
+      <ul class="limits">
+        <li>macOS Excel + Outlook required for Pivot/PNG/send; unit tests mock those surfaces.</li>
+        <li>~1M-row workbook often exceeds mailbox limits — email-safe ZIP omits xlsx on purpose.</li>
+        <li>Openpyxl load of the full UCI workbook remains the largest prep wall-clock; calamine/engine experiments are a follow-up.</li>
+        <li>Next: publish this page via GitHub Pages; optional full-pipeline timing card from a real <code>pipeline_run_latest.json</code> on CI hardware.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      Live: <a href="https://mona566.github.io/python-retail-assessment/">mona566.github.io/python-retail-assessment</a>
+      · Local: <code>python -m http.server 8000 --directory docs</code>
+    </div>
+  </footer>
+</body>
+</html>
