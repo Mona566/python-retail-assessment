@@ -55,24 +55,8 @@
       max-width: 52ch;
       margin: 0 0 1.75rem;
     }
-    .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; align-items: center; }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.7rem 1.15rem;
-      border-radius: 999px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
-      border: 1px solid transparent;
-      transition: transform 160ms ease, background 160ms ease;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-primary { background: var(--ink); color: #f4faf8; }
-    .btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }
     .meta {
-      margin-top: 1.5rem;
+      margin-top: 0.25rem;
       font-size: 0.88rem;
       color: var(--muted);
     }
@@ -213,7 +197,6 @@
       color: var(--ink-soft);
     }
     @media (prefers-reduced-motion: reduce) {
-      .btn:hover { transform: none; }
       html { scroll-behavior: auto; }
     }
   </style>
@@ -227,11 +210,6 @@
         native Excel PivotTables / PNGs → ZIP → Outlook dry-run.
         Built to be reviewable — timed phases, fail-loud validation, and measured hotspots.
       </p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://github.com/Mona566/python-retail-assessment#readme" target="_blank" rel="noopener">Read README</a>
-        <a class="btn btn-ghost" href="pipeline.html">Pipeline detail</a>
-        <a class="btn btn-ghost" href="https://github.com/Mona566/python-retail-assessment/blob/main/scripts/bench_hotspots.py" target="_blank" rel="noopener">Bench script</a>
-      </div>
       <p class="meta">
         Metrics below are from this machine’s pytest + <code>scripts/bench_hotspots.py --rows 100000</code>
         (2026-11-20 · Python 3.12 · macOS arm64). Re-run to refresh.
