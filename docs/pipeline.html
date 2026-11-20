@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pipeline detail — Python Retail Assessment</title>
+  <meta name="description" content="End-to-end pipeline: prepare → analyse → Excel → validate → ZIP → Outlook dry-run." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f1c24;
+      --ink-soft: #243642;
+      --paper: #f6f8f7;
+      --line: rgba(15, 28, 36, 0.12);
+      --teal: #0f766e;
+      --teal-deep: #115e59;
+      --muted: #5b6b75;
+      --max: 920px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(1000px 420px at 8% -8%, rgba(15, 118, 110, 0.14), transparent 55%),
+        linear-gradient(180deg, #eef4f2 0%, var(--paper) 30%, #fbfcfb 100%);
+      font-family: "Instrument Sans", system-ui, sans-serif;
+      line-height: 1.55;
+    }
+    a { color: var(--teal-deep); }
+    .wrap { width: min(100% - 2.5rem, var(--max)); margin-inline: auto; }
+    .topnav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      align-items: center;
+      padding: 1.25rem 0 0;
+      font-size: 0.92rem;
+    }
+    .topnav a { text-decoration: none; font-weight: 600; color: var(--ink-soft); }
+    .topnav a:hover { color: var(--teal-deep); }
+    header {
+      padding: 2rem 0 2.25rem;
+      border-bottom: 1px solid var(--line);
+    }
+    h1 {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: clamp(1.9rem, 4vw, 2.6rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.6rem;
+      line-height: 1.15;
+    }
+    .lede { margin: 0; color: var(--ink-soft); max-width: 58ch; }
+    section {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    h2 {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 600;
+      margin: 0 0 0.85rem;
+    }
+    h3 { margin: 1.35rem 0 0.45rem; font-size: 1.05rem; }
+    p, li { color: var(--ink-soft); }
+    .mermaid {
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1rem 0.5rem;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.7rem 0.85rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      background: rgba(15, 28, 36, 0.04);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    tr:last-child td { border-bottom: 0; }
+    code {
+      font-size: 0.88em;
+      background: rgba(15, 28, 36, 0.06);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+    }
+    .step {
+      margin: 1rem 0;
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+    .step h3 { margin-top: 0; }
+    .step p:last-child { margin-bottom: 0; }
+    ul { padding-left: 1.2rem; }
+    footer {
+      padding: 2rem 0 3rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav">
+      <a href="index.html">← Showcase</a>
+      <a href="https://github.com/Mona566/python-retail-assessment#readme" target="_blank" rel="noopener">README</a>
+      <a href="https://github.com/Mona566/python-retail-assessment/blob/main/docs/PIPELINE_FLOW.md" target="_blank" rel="noopener">Full markdown on GitHub</a>
+    </nav>
+
+    <header>
+      <h1>Pipeline detail</h1>
+      <p class="lede">
+        End-to-end order of the Online Retail II take-home: what each stage does,
+        which module owns it, and what lands under <code>output/</code>.
+      </p>
+    </header>
+
+    <section>
+      <h2>Framework</h2>
+      <div class="mermaid">
+flowchart TD
+  A[main.py] --> B[config / logging]
+  B --> C{Data prep}
+  C -->|prepare_dataset| D[data_processing]
+  C -->|--reuse-clean| E[load_prepared parquet]
+  D --> F[analysis.run_analyses]
+  E --> F
+  F --> G[excel_automation.build_workbook]
+  G --> H[validation.run_validations]
+  H --> I[packaging ZIP]
+  I --> J[email dry-run]
+  J --> K{--send?}
+  K -->|no| L[Pipeline OK]
+  K -->|yes| M[Outlook one send]
+      </div>
+      <table style="margin-top:1.25rem">
+        <thead>
+          <tr><th>Layer</th><th>Path</th><th>Role</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Entry</td><td><code>main.py</code></td><td>CLI, stage orchestration, send policy</td></tr>
+          <tr><td>Config</td><td><code>src/config.py</code></td><td>Paths, <code>.env</code> (no hardcoded secrets)</td></tr>
+          <tr><td>Contract</td><td><code>src/metrics.py</code></td><td>Gross / Net / returns / Top-N (v1.6.2)</td></tr>
+          <tr><td>Data</td><td><code>src/data_processing.py</code></td><td>Load, dedupe, enrich, parquet, audits</td></tr>
+          <tr><td>Analysis</td><td><code>src/analysis*.py</code></td><td>Six analyses + anomalies + Summary</td></tr>
+          <tr><td>Excel</td><td><code>src/excel_*.py</code></td><td>Clean_Data / Summary / native Pivot / PNG</td></tr>
+          <tr><td>Validation</td><td><code>src/validation.py</code></td><td>Prep / analyses / workbook / PNG asserts</td></tr>
+          <tr><td>Delivery</td><td><code>packaging</code> + <code>email_automation</code></td><td>Full ZIP, email-safe ZIP, Outlook dry-run</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Stages</h2>
+
+      <div class="step">
+        <h3>0 — Start</h3>
+        <p><code>parse_args</code> · <code>setup_logging</code> · <code>ensure_dirs</code>. Logs under <code>output/logs/</code>.</p>
+        <p>Flags: <code>--reuse-clean</code>, <code>--skip-excel</code> / <code>--skip-png</code> / <code>--skip-zip</code>, <code>--email-preview-only</code>, <code>--send</code> / <code>--send-to</code>.</p>
+      </div>
+
+      <div class="step">
+        <h3>1 — Prepare</h3>
+        <p><code>prepare_dataset()</code> or <code>load_prepared()</code> in <code>data_processing.py</code>.</p>
+        <ul>
+          <li>Locate workbook + SHA-256</li>
+          <li>Single <code>ExcelFile</code> load of both year sheets</li>
+          <li>Cross-sheet dedupe → enrich taxonomy → Parquet + audit JSON/CSV</li>
+        </ul>
+        <p>Return taxonomy: <code>is_return_line</code> → <code>is_confirmed_return</code> (cuts Net) vs <code>is_stock_adjustment</code> (units only).</p>
+      </div>
+
+      <div class="step">
+        <h3>2 — Analyse</h3>
+        <p><code>run_analyses(clean)</code> → <code>AnalysisBundle</code> (summary, six tables, anomalies, narrative) → <code>output/analysis_summary.json</code>.</p>
+        <p>Product / Country (ex-UK) / Monthly / Returns Top-N / Customer / Timing · IQR anomaly quotas · contract KPIs.</p>
+      </div>
+
+      <div class="step">
+        <h3>3 — Excel + PNG</h3>
+        <p><code>build_workbook</code>: xlsxwriter base book → xlwings native PivotTables → six full-table PNGs. Rate/helper pivots must hide bottom Grand Total or the run fails.</p>
+      </div>
+
+      <div class="step">
+        <h3>4 — Validate</h3>
+        <p><code>run_validations</code>: row/metric consistency, UK exclusion, sheet/Pivot presence, non-empty PNGs. Failures → exit code 1.</p>
+      </div>
+
+      <div class="step">
+        <h3>5 — Package</h3>
+        <p>Full submission ZIP (includes xlsx) + email-safe ZIP (no xlsx, mailbox-friendly).</p>
+      </div>
+
+      <div class="step">
+        <h3>6 — Email (dry-run by default)</h3>
+        <p>HTML preview + CID MIME draft under <code>output/email_preview/</code>. Real Outlook send only with explicit <code>--send</code>; at most one message.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Suggested reading order</h2>
+      <ol>
+        <li><code>src/metrics.py</code> — number definitions</li>
+        <li><code>main.py</code> — stage skeleton</li>
+        <li><code>src/data_processing.py</code> — enrich / dedupe</li>
+        <li><code>src/analysis*.py</code> — rankings &amp; anomalies</li>
+        <li><code>src/excel_*.py</code> — pivots &amp; PNG</li>
+        <li><code>tests/</code> — synthetic regression without Office</li>
+      </ol>
+    </section>
+
+    <footer>
+      <a href="index.html">← Back to showcase</a>
+      · Source of truth markdown:
+      <a href="https://github.com/Mona566/python-retail-assessment/blob/main/docs/PIPELINE_FLOW.md" target="_blank" rel="noopener">PIPELINE_FLOW.md</a>
+    </footer>
+  </div>
+
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "neutral",
+      securityLevel: "loose",
+      flowchart: { curve: "basis", htmlLabels: true },
+    });
+    await mermaid.run({ querySelector: ".mermaid" });
+  </script>
+</body>
+</html>
